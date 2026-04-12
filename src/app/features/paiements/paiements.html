@@ -1,0 +1,166 @@
+<div class="mb-6">
+  <h1 class="text-2xl font-bold text-gray-800">Gestion des Paiements</h1>
+  <p class="text-gray-500 text-sm mt-1">Enregistrez les transactions et consultez l'historique financier.</p>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+  
+  <div class="lg:col-span-2">
+    <div class="card p-6 shadow-sm border border-gray-100 bg-white rounded-2xl">
+      <h2 class="text-base font-semibold text-gray-800 mb-4 flex items-center gap-2">
+        <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+        </svg>
+        Nouveau Paiement
+      </h2>
+
+      <div *ngIf="erreur()" class="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded-lg mb-3 text-sm animate-pulse">
+        {{ erreur() }}
+      </div>
+      <div *ngIf="succes()" class="bg-green-50 border border-green-200 text-green-700 px-3 py-2 rounded-lg mb-3 text-sm">
+        {{ succes() }}
+      </div>
+
+      <div *ngIf="reservation()" class="bg-blue-50 border border-blue-100 rounded-xl p-4 mb-5 shadow-inner transition-all">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-[10px] uppercase tracking-wider text-blue-500 font-bold">Référence Réservation</p>
+            <p class="font-bold text-blue-900">{{ reservation()?.numeroReservation || 'N/A' }}</p>
+          </div>
+          <span class="text-blue-700 text-[10px] font-bold bg-white px-2 py-1 rounded-full border border-blue-200 uppercase">
+            {{ reservation()?.statut }}
+          </span>
+        </div>
+        <div class="mt-3 text-sm text-blue-800">
+          <p class="flex items-center gap-2 font-medium" *ngIf="reservation()?.voyage">
+            <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            {{ reservation()?.voyage?.villeDepart }} → {{ reservation()?.voyage?.villeArrivee }}
+          </p>
+          <div class="mt-3 flex items-baseline gap-1">
+            <span class="text-2xl font-black text-blue-600">{{ (reservation()?.montantTotal || 0) | number:'1.0-0' }}</span>
+            <span class="text-xs font-bold text-blue-400">FCFA</span>
+          </div>
+        </div>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4">
+        <div>
+          <label class="label text-gray-600 font-medium mb-1 block">ID de la Réservation</label>
+          <div class="flex gap-2">
+            <input type="number" class="input flex-1 focus:ring-2 focus:ring-green-500" 
+                   formControlName="reservationId" 
+                   placeholder="Ex: 42"
+                   (keydown.enter)="$event.preventDefault(); chargerReservation()">
+            <button type="button" (click)="chargerReservation()" 
+                    class="btn bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 transition-all"
+                    title="Vérifier la réservation">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <label class="label text-gray-600 font-medium mb-1 block">Mode de règlement</label>
+          <select class="input w-full" formControlName="modePaiement">
+            <option value="">-- Sélectionner le mode --</option>
+            <option *ngFor="let m of modes" [value]="m">{{ m.replace('_', ' ') }}</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="label text-gray-600 font-medium mb-1 block">Référence Transaction</label>
+          <input type="text" class="input w-full" formControlName="referenceTransaction" placeholder="Ex: OM-458962">
+        </div>
+
+        <button type="submit" [disabled]="chargement() || form.invalid" 
+                class="btn btn-success w-full py-3 mt-4 shadow-md disabled:opacity-50 disabled:cursor-not-allowed transform active:scale-95 transition-all">
+          <span *ngIf="!chargement()" class="flex items-center justify-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Confirmer l'encaissement
+          </span>
+          <span *ngIf="chargement()" class="flex items-center justify-center">
+            <svg class="animate-spin w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            </svg>
+            Traitement...
+          </span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div class="lg:col-span-3">
+    <div class="card overflow-hidden shadow-sm border border-gray-100 bg-white rounded-2xl">
+      <div class="px-5 py-4 bg-gray-50/50 border-b border-gray-100 flex justify-between items-center">
+        <h2 class="text-base font-semibold text-gray-800">Dernières transactions</h2>
+        <button (click)="rafraichirHistorique()" 
+                class="flex items-center gap-1 text-blue-600 hover:text-blue-800 text-xs font-bold uppercase tracking-tighter">
+          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Actualiser
+        </button>
+      </div>
+      
+      <div class="table-wrapper overflow-x-auto">
+        <table class="w-full text-left">
+          <thead class="bg-gray-50 border-b border-gray-100">
+            <tr>
+              <th class="px-4 py-3 text-[10px] font-bold text-gray-400 uppercase">Référence</th>
+              <th class="px-4 py-3 text-[10px] font-bold text-gray-400 uppercase">Montant</th>
+              <th class="px-4 py-3 text-[10px] font-bold text-gray-400 uppercase">Mode</th>
+              <th class="px-4 py-3 text-[10px] font-bold text-gray-400 uppercase text-center">Statut</th>
+              <th class="px-4 py-3 text-[10px] font-bold text-gray-400 uppercase">Date</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-50">
+            <tr *ngFor="let p of paiements()" class="hover:bg-blue-50/20 transition-colors group">
+              <td class="px-4 py-4">
+                <span class="bg-gray-100 group-hover:bg-white px-2 py-1 rounded text-[10px] font-mono font-bold text-gray-600 border border-transparent group-hover:border-gray-200">
+                  {{ p?.referenceTransaction || 'N/A' }}
+                </span>
+              </td>
+              <td class="px-4 py-4">
+                <div class="flex flex-col">
+                  <span class="font-bold text-sm text-gray-800">{{ p?.montant | number:'1.0-0' }}</span>
+                  <span class="text-[9px] font-bold text-gray-400 uppercase">FCFA</span>
+                </div>
+              </td>
+              <td class="px-4 py-4 text-[11px] text-gray-500 font-medium">
+                {{ p?.modePaiement?.replace('_',' ') }}
+              </td>
+              <td class="px-4 py-4 text-center">
+                <span class="badge text-[9px] font-bold uppercase tracking-wider" [ngClass]="badgeStatut(p?.statut || '')">
+                  {{ p?.statut }}
+                </span>
+              </td>
+              <td class="px-4 py-4 text-[11px] text-gray-400">
+                {{ p?.datePaiement | date:'dd/MM/yy' }}<br>
+                <span class="text-[9px] text-gray-300">{{ p?.datePaiement | date:'HH:mm' }}</span>
+              </td>
+            </tr>
+
+            <tr *ngIf="paiements().length === 0">
+              <td colspan="5" class="text-center py-16">
+                <div class="flex flex-col items-center opacity-20">
+                  <svg class="w-16 h-16 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                  <p class="text-lg font-medium">Aucun flux financier</p>
+                  <p class="text-xs italic">Les transactions validées apparaîtront ici.</p>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,21 @@
+<div class="max-w-4xl mx-auto p-6 bg-white rounded-3xl shadow-sm mt-10">
+  <div class="flex justify-between items-center mb-8">
+    <h1 class="text-3xl font-black text-gray-900 tracking-tight">Mes Notifications</h1>
+    <span class="bg-red-100 text-red-600 font-bold px-3 py-1 rounded-full text-sm">3 nouvelles</span>
+  </div>
+
+  <div class="space-y-4">
+    <div *ngFor="let notif of mesNotifications()" class="p-5 bg-gray-50 rounded-2xl border border-gray-100 flex gap-4 items-start">
+      <div class="p-3 bg-white rounded-lg shadow-sm text-blue-500">
+        <svg *ngIf="notif.type === 'CONFIRMATION'" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+        <svg *ngIf="notif.type === 'ALERTE'" class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+      </div>
+
+      <div class="flex-1">
+        <p class="font-bold text-gray-800">{{ notif.sujet }}</p>
+        <p class="text-sm text-gray-600 mt-1">{{ notif.message }}</p>
+        <span class="text-xs text-gray-400 font-medium mt-2 block">{{ notif.dateCreation | date:'dd MMM yyyy, HH:mm' }}</span>
+      </div>
+    </div>
+  </div>
+</div>

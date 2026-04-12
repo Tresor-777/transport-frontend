@@ -1,0 +1,10 @@
+{
+    "explorer.confirmDelete": false,
+    "js/ts.updateImportsOnFileMove.enabled": "always",
+    "chat.viewSessions.orientation": "stacked",
+    "files.autoSave": "afterDelay",
+    "workbench.editor.empty.hint": "hidden",
+    "workbench.startupEditor": "none",
+    "terminal.integrated.enableMultiLinePasteWarning": "never",
+    "claudeCode.preferredLocation": "panel"
+}

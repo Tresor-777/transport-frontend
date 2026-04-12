@@ -1,0 +1,38 @@
+<div class="bus-container">
+  <!-- Section Plan de Bus -->
+  <div class="bus-card">
+    <h3>Plan du véhicule</h3>
+    <div class="bus-grid">
+      <div *ngFor="let num of sieges" 
+           class="seat"
+           [class.occupied]="isOccupied(num)"
+           [class.selected]="siegeSelectionne === num"
+           (click)="selectSiege(num)">
+        {{ num }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Section Formulaire (Apparaît au clic) -->
+  <div class="form-card" *ngIf="siegeSelectionne">
+    <h3>Informations du Passager - Siège n°{{ siegeSelectionne }}</h3>
+    <form (submit)="confirmerReservation()">
+      <div class="form-group">
+        <label>Nom complet</label>
+        <input type="text" [(ngModel)]="voyageur.nom" name="nom" required placeholder="Ex: NDONGO">
+      </div>
+
+      <div class="form-group">
+        <label>Numéro CNI</label>
+        <input type="text" [(ngModel)]="voyageur.numeroCni" name="cni" required placeholder="123456789">
+      </div>
+
+      <div class="form-group">
+        <label>Téléphone</label>
+        <input type="tel" [(ngModel)]="voyageur.telephone" name="tel" required placeholder="6xx xx xx xx">
+      </div>
+
+      <button type="submit" class="btn-reserver">Confirmer la réservation</button>
+    </form>
+  </div>
+</div>

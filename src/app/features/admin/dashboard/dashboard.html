@@ -1,0 +1,128 @@
+<div class="mb-8 animate-fade-in">
+  <h1 class="text-2xl font-black text-gray-800 tracking-tight text-3xl">Dashboard Admin</h1>
+  <p class="text-gray-500 text-sm mt-1 font-medium">Vue d'ensemble et pilotage du système de transport</p>
+</div>
+
+<!-- LOADER OPTIMISÉ -->
+<div *ngIf="chargement()" class="flex flex-col items-center justify-center py-32 animate-pulse">
+  <div class="animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent shadow-md"></div>
+  <p class="text-gray-400 text-xs font-bold uppercase mt-4 tracking-widest">Synchronisation des données...</p>
+</div>
+
+<!-- CONTENU PRINCIPAL -->
+<div *ngIf="!chargement()" class="space-y-8 animate-in fade-in duration-500">
+  
+  <!-- SECTION 1 : CARTES DE STATISTIQUES -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+
+    <!-- Voyages -->
+    <div class="bg-white rounded-3xl p-5 border-l-4 border-blue-500 shadow-sm hover:shadow-md transition-shadow">
+      <div class="flex items-center justify-between mb-3">
+        <p class="text-[10px] font-bold uppercase text-gray-400 tracking-wider">Voyages</p>
+        <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" /></svg>
+        </div>
+      </div>
+      <p class="text-3xl font-black text-gray-800">{{ stats().voyages }}</p>
+      <p class="text-[10px] text-green-600 mt-1 font-bold">{{ stats().voyagesDisponibles }} ouverts à la vente</p>
+    </div>
+
+    <!-- Réservations -->
+    <div class="bg-white rounded-3xl p-5 border-l-4 border-green-500 shadow-sm">
+      <div class="flex items-center justify-between mb-3">
+        <p class="text-[10px] font-bold uppercase text-gray-400 tracking-wider">Réservations</p>
+        <div class="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center text-green-600">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
+        </div>
+      </div>
+      <p class="text-3xl font-black text-gray-800">{{ stats().reservations }}</p>
+      <p class="text-[10px] text-yellow-600 mt-1 font-bold">{{ stats().reservationsEnAttente }} en attente</p>
+    </div>
+
+    <!-- Paiements (Revenus) -->
+    <div class="bg-white rounded-3xl p-5 border-l-4 border-purple-500 shadow-sm">
+      <div class="flex items-center justify-between mb-3">
+        <p class="text-[10px] font-bold uppercase text-gray-400 tracking-wider">Revenus</p>
+        <div class="w-10 h-10 bg-purple-50 rounded-xl flex items-center justify-center text-purple-600">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
+        </div>
+      </div>
+      <p class="text-2xl font-black text-gray-800">{{ stats().montantTotal | number:'1.0-0' }} <span class="text-xs">CFA</span></p>
+      <p class="text-[10px] text-purple-600 mt-1 font-bold">{{ stats().paiements }} transactions</p>
+    </div>
+
+    <!-- Utilisateurs -->
+    <div class="bg-white rounded-3xl p-5 border-l-4 border-orange-500 shadow-sm">
+      <div class="flex items-center justify-between mb-3">
+        <p class="text-[10px] font-bold uppercase text-gray-400 tracking-wider">Communauté</p>
+        <div class="w-10 h-10 bg-orange-50 rounded-xl flex items-center justify-center text-orange-600">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+        </div>
+      </div>
+      <p class="text-3xl font-black text-gray-800">{{ stats().utilisateurs }}</p>
+      <p class="text-[10px] text-orange-600 mt-1 font-bold">{{ stats().admins }} admin(s)</p>
+    </div>
+
+    <!-- Bus -->
+    <div class="bg-white rounded-3xl p-5 border-l-4 border-red-500 shadow-sm">
+      <div class="flex items-center justify-between mb-3">
+        <p class="text-[10px] font-bold uppercase text-gray-400 tracking-wider">Parc Auto</p>
+        <div class="w-10 h-10 bg-red-50 rounded-xl flex items-center justify-center text-red-600">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg>
+        </div>
+      </div>
+      <p class="text-3xl font-black text-gray-800">{{ stats().bus }}</p>
+      <p class="text-[10px] text-red-600 mt-1 font-bold">Véhicules actifs</p>
+    </div>
+
+  </div>
+
+  <!-- SECTION 2 : ACTIONS RAPIDES -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    
+    <!-- Action : Voyages -->
+    <a routerLink="/voyages" class="bg-white p-6 rounded-3xl flex items-center gap-5 hover:-translate-y-2 hover:shadow-xl transition-all cursor-pointer group border border-gray-50">
+      <div class="w-14 h-14 bg-blue-600 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-blue-200 group-hover:rotate-6 transition-transform">
+        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg>
+      </div>
+      <div>
+        <h3 class="font-black text-gray-800">Trajets</h3>
+        <p class="text-[10px] font-bold text-gray-400 uppercase">Gérer les lignes</p>
+      </div>
+    </a>
+
+    <!-- Action : Bus -->
+    <a routerLink="/admin/bus" class="bg-white p-6 rounded-3xl flex items-center gap-5 hover:-translate-y-2 hover:shadow-xl transition-all cursor-pointer group border border-gray-50">
+      <div class="w-14 h-14 bg-red-600 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-red-200 group-hover:rotate-6 transition-transform">
+        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-10V4m-5 4h.01" /></svg>
+      </div>
+      <div>
+        <h3 class="font-black text-gray-800">Véhicules</h3>
+        <p class="text-[10px] font-bold text-gray-400 uppercase">Gestion flotte</p>
+      </div>
+    </a>
+
+    <!-- Action : Membres -->
+    <a routerLink="/admin/utilisateurs" class="bg-white p-6 rounded-3xl flex items-center gap-5 hover:-translate-y-2 hover:shadow-xl transition-all cursor-pointer group border border-gray-50">
+      <div class="w-14 h-14 bg-orange-600 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-orange-200 group-hover:rotate-6 transition-transform">
+        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+      </div>
+      <div>
+        <h3 class="font-black text-gray-800">Membres</h3>
+        <p class="text-[10px] font-bold text-gray-400 uppercase">Utilisateurs</p>
+      </div>
+    </a>
+
+    <!-- Action : Rapports -->
+    <a routerLink="/admin/paiements" class="bg-white p-6 rounded-3xl flex items-center gap-5 hover:-translate-y-2 hover:shadow-xl transition-all cursor-pointer group border border-gray-50">
+      <div class="w-14 h-14 bg-purple-600 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-purple-200 group-hover:rotate-6 transition-transform">
+        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2" /></svg>
+      </div>
+      <div>
+        <h3 class="font-black text-gray-800">Finance</h3>
+        <p class="text-[10px] font-bold text-gray-400 uppercase">Transactions</p>
+      </div>
+    </a>
+
+  </div>
+</div>
