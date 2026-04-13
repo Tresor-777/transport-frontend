@@ -2,7 +2,6 @@ import { Component, inject, signal, OnInit, computed } from '@angular/core';
 import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-
 import { VoyageService } from '../../../core/services/VoyageService';
 import { BusService } from '../../../core/services/BusService';
 import { AuthService } from '../../../core/services/auth.service';
@@ -45,11 +44,49 @@ export class VoyageComponent implements OnInit {
   // --- FILTRES COMPUTED ---
   
   // Pour le CLIENT : Uniquement les voyages à venir
+  // --- FILTRES COMPUTED ---
+
+// --- FILTRES COMPUTED ---
+
+// Filtre les voyages pour l'affichage (ton code d'origine)
   voyagesFuturs = computed(() => {
     const maintenant = new Date().getTime();
     return this.voyages().filter(v => new Date(v.dateDepart).getTime() >= maintenant);
   });
 
+  // LA RÈGLE DE L'INSTANT T
+  busDisponiblesPourDate = computed(() => {
+    const dateDepartSaisie = this.formVoyage.get('dateDepart')?.value;
+    const busActuelId = this.voyageEnEdition()?.bus?.id;
+
+    // Si pas de date saisie, on montre les bus DISPONIBLES
+    if (!dateDepartSaisie) {
+      return this.listeDesBus().filter(b => b.statut === 'DISPONIBLE' || b.id === busActuelId);
+    }
+
+    const instantT = new Date(dateDepartSaisie).getTime();
+
+    return this.listeDesBus().filter(bus => {
+      // 1. Le bus doit être techniquement OK
+      const estDisponible = bus.statut === 'DISPONIBLE' || bus.id === busActuelId;
+
+      // 2. STICTE : Le bus n'est pas déjà pris à cet INSTANT T précis
+      const nEstPasPrisAilleurs = !this.voyages().some(v => 
+        v.bus?.id === bus.id && 
+        v.id !== this.voyageEnEdition()?.id && 
+        new Date(v.dateDepart).getTime() === instantT
+      );
+
+      return estDisponible && nEstPasPrisAilleurs;
+    });
+  });
+
+  calculerStatutVisuel(v: Voyage): string {
+    if ((v.placesDisponibles ?? 0) <= 0 || v.statut === 'COMPLET') {
+      return 'EN ROUTE';
+    }
+    return v.statut || 'DISPONIBLE';
+  }
   // Pour l'ADMIN : Filtrer les bus exploitables
   busDisponibles = computed(() => {
     const idBusActuel = this.voyageEnEdition()?.bus?.id;

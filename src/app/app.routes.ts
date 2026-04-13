@@ -9,7 +9,6 @@ export const routes: Routes = [
   { 
     path: '', 
     component: LandingPageComponent, 
-    canActivate: [logoutGuard] 
   },
 
   // 🔐 AUTHENTIFICATION
@@ -86,7 +85,7 @@ export const routes: Routes = [
 
  // 🔔 NOTIFICATIONS UTILISATEUR
 { 
-  path: 'notifications', // Ajoute le 's' pour être cohérent avec ton routerLink
+  path: 'notification', // Ajoute le 's' pour être cohérent avec ton routerLink
   canActivate: [authGuard],
   loadComponent: () => import('./features/notification/notification').then(m => m.NotificationsComponent) 
 },

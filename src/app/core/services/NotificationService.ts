@@ -8,51 +8,64 @@ export class NotificationService {
   private http = inject(HttpClient);
   private readonly apiUrl = `${environment.apiUrl}/notifications`;
 
-  /**
-   * SUPPRIMER : Efface une notification de la base de données.
-   * C'est la méthode qui manquait pour corriger ton erreur actuelle.
-   */
-  supprimer(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
-  }
+  // --- PARTIE ADMIN (Routes commençant par /admin dans ton Java) ---
 
   /**
-   * ENVOYER TOUTES : Traite la file d'attente
-   */
-  envoyerToutes(): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/envoyer-tout`, {});
-  }
-
-  /**
-   * ENVOYER : Envoi spécifique par ID
-   */
-  envoyer(notificationId: number): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/${notificationId}/envoyer`, {});
-  }
-
-  /**
-   * CRÉER : Enregistre une nouvelle notification
+   * Créer une notification (Admin)
+   * Correspond à : POST /api/notifications/admin
    */
   creer(notification: any): Observable<any> {
-    return this.http.post<any>(this.apiUrl, notification);
+    return this.http.post<any>(`${this.apiUrl}/admin`, notification);
   }
 
   /**
-   * LISTER : Toutes les notifications (avec alias pour éviter les erreurs de genre)
+   * Lister toutes les notifications (Admin)
+   * Correspond à : GET /api/notifications/admin
    */
   listerTous(): Observable<any[]> {
-    return this.http.get<any[]>(this.apiUrl);
+    return this.http.get<any[]>(`${this.apiUrl}/admin`);
   }
 
-  listerToutes(): Observable<any[]> {
-    return this.listerTous();
-  }
-
+  /**
+   * Lister les notifications non envoyées (Admin)
+   * Correspond à : GET /api/notifications/admin/non-envoyees
+   */
   listerNonEnvoyees(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/non-envoyees`);
+    return this.http.get<any[]>(`${this.apiUrl}/admin/non-envoyees`);
   }
 
-  // --- AFFICHAGE UI ---
-  success(message: string) { alert('✅ SUCCESS: ' + message); }
-  error(message: string) { alert('❌ ERREUR: ' + message); }
+  /**
+   * Envoi spécifique par ID (Admin)
+   * Correspond à : POST /api/notifications/admin/{id}/envoyer
+   */
+  envoyer(id: number): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/admin/${id}/envoyer`, {});
+  }
+
+  /**
+   * Envoie toutes les notifications (Admin)
+   * ATTENTION : Vérifie que ton Java accepte "envoyer-toutes" (avec un 'es')
+   * Correspond à : POST /api/notifications/admin/envoyer-toutes
+   */
+  envoyerToutes(): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/admin/envoyer-toutes`, {});
+  }
+
+  /**
+   * Supprimer une notification (Admin)
+   * Correspond à : DELETE /api/notifications/admin/{id}
+   */
+  supprimer(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/admin/${id}`);
+  }
+
+  // --- PARTIE UTILISATEUR ---
+
+  /**
+   * Liste les notifications pour un utilisateur précis
+   * Correspond à : GET /api/notifications/utilisateur/{id}
+   */
+  listerParUtilisateur(utilisateurId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/utilisateur/${utilisateurId}`);
+  }
 }

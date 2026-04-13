@@ -31,6 +31,6 @@ export class BusService {
 
   // 5. Supprimer un bus (Résout votre erreur : La propriété 'supprimer' n'existe pas)
   supprimer(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/admin/${id}`);
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 }
